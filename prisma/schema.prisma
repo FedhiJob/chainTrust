@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id           String   @id @default(uuid())
+  fullName     String
+  email        String   @unique
+  password     String
+  role         String
+  organization String
+  createdAt    DateTime @default(now())
+
+  sentTransfers     Transfer[] @relation("SenderTransfers")
+  receivedTransfers Transfer[] @relation("ReceiverTransfers")
+}
+
+model Batch {
+  id           String   @id @default(uuid())
+  batchCode    String   @unique
+  medicineName String
+  quantity     Int
+  expiryDate   DateTime
+  origin       String
+  status       String
+  trustHash    String
+  qrCode       String?
+  createdBy    String
+  createdAt    DateTime @default(now())
+
+  transfers Transfer[]
+}
+
+model Transfer {
+  id         String   @id @default(uuid())
+  batchId    String
+  senderId   String
+  receiverId String
+  location   String
+  note       String?
+  verified   Boolean  @default(false)
+  hash       String
+  createdAt  DateTime @default(now())
+
+  batch    Batch @relation(fields: [batchId], references: [id])
+  sender   User  @relation("SenderTransfers", fields: [senderId], references: [id])
+  receiver User  @relation("ReceiverTransfers", fields: [receiverId], references: [id])
+}
