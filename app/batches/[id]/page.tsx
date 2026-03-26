@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/use-auth";
 import { useToast } from "@/components/toast";
 
@@ -27,7 +27,12 @@ type BatchDetail = {
   transfers: Transfer[];
 };
 
-export default function BatchDetailPage({ params }: { params: { id: string } }) {
+export default function BatchDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
   const { user } = useAuth();
   const { notify } = useToast();
   const [batch, setBatch] = useState<BatchDetail | null>(null);
@@ -38,7 +43,7 @@ export default function BatchDetailPage({ params }: { params: { id: string } }) 
   useEffect(() => {
     const load = async () => {
       try {
-        const response = await fetch(`/api/batches/${params.id}`, { cache: "no-store" });
+        const response = await fetch(`/api/batches/${id}`, { cache: "no-store" });
         const result = await response.json();
         if (!response.ok || !result.success) {
           setError(result.message ?? "Unable to load batch");
@@ -50,7 +55,7 @@ export default function BatchDetailPage({ params }: { params: { id: string } }) 
       }
     };
     load();
-  }, [params.id]);
+  }, [id]);
 
   const latestTransfer = batch?.transfers[0];
   const verifiedTransfer = useMemo(
