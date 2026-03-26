@@ -73,10 +73,16 @@ export async function POST(request: Request) {
     const timestamp = new Date();
     const batchId = crypto.randomUUID();
     const trustHash = sha256(`${batchCode}${medicineName}${timestamp.toISOString()}`);
+    const forwardedProto = request.headers.get("x-forwarded-proto") ?? "http";
+    const forwardedHost =
+      request.headers.get("x-forwarded-host") ?? request.headers.get("host");
+    const inferredBaseUrl = forwardedHost
+      ? `${forwardedProto}://${forwardedHost}`
+      : "http://localhost:3000";
     const baseUrl =
       process.env.APP_BASE_URL ??
       process.env.NEXT_PUBLIC_APP_URL ??
-      "http://localhost:3000";
+      inferredBaseUrl;
     const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl.slice(0, -1) : baseUrl;
     const qrContent = `${normalizedBaseUrl}/verify/${batchId}`;
     const qrCode = await QRCode.toDataURL(qrContent);
