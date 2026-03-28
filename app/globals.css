@@ -10,6 +10,10 @@
   --accent-warm: #c0392b;
   --border: rgba(16, 24, 39, 0.12);
   --shadow: 0 24px 60px rgba(20, 40, 80, 0.12);
+  --font-sans: "IBM Plex Sans", "Inter", system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+  --font-mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Monaco, Consolas,
+    "Liberation Mono", monospace;
 }
 
 @theme inline {
@@ -21,8 +25,6 @@
   --color-accent-strong: var(--accent-strong);
   --color-accent-warm: var(--accent-warm);
   --color-border: var(--border);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-mono);
 }
 
 body {

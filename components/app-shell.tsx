@@ -1,38 +1,17 @@
-﻿"use client";
+"use client";
 
 import Image from "next/image";
-import NextLink from "next/link";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Box,
-  Button,
-  CloseButton,
-  DrawerBackdrop,
-  DrawerBody,
-  DrawerCloseTrigger,
-  DrawerContent,
-  DrawerHeader,
-  DrawerPositioner,
-  DrawerRoot,
-  DrawerTitle,
-  Flex,
-  HStack,
-  IconButton,
-  Link,
-  Text,
-  useDisclosure,
-  VStack,
-} from "@chakra-ui/react";
-import { HamburgerIcon } from "@chakra-ui/icons";
 import { ToastProvider } from "@/components/toast";
 import { useAuth } from "@/lib/use-auth";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { open, onOpen, onClose, setOpen } = useDisclosure();
   const { user } = useAuth();
 
   const hideChrome =
@@ -44,6 +23,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [pathname]);
 
   const navLinks = useMemo(() => {
     if (!user) return [];
@@ -70,178 +53,112 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
       {showChrome ? (
-        <Box minH="100vh" display="flex" flexDirection="column">
-          <Box
-            as="header"
-            borderBottom="1px solid"
-            borderColor="var(--border)"
-            bg="var(--surface)"
-            backdropFilter="blur(10px)"
-          >
-            <Flex
-              maxW="6xl"
-              mx="auto"
-              px={{ base: 4, md: 6 }}
-              py={{ base: 4, md: 4 }}
-              align="center"
-              justify="space-between"
-              gap={4}
-            >
-              <HStack spacing={3} align="center">
+        <div className="min-h-screen flex flex-col">
+          <header className="border-b border-border bg-surface/90 backdrop-blur">
+            <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 md:px-6">
+              <div className="flex items-center gap-3">
                 <Image src="/logo.png" alt="ChainTrust logo" width={36} height={36} />
-                <Box>
-                  <Text fontSize="sm" fontWeight="600" color="var(--foreground)">
-                    ChainTrust
-                  </Text>
-                  <Text fontSize="xs" color="var(--muted)">
+                <div>
+                  <p className="text-sm font-semibold text-foreground">ChainTrust</p>
+                  <p className="text-xs text-muted">
                     Trust infrastructure for physical goods
-                  </Text>
-                </Box>
-              </HStack>
+                  </p>
+                </div>
+              </div>
 
-              <HStack
-                spacing={4}
-                display={{ base: "none", md: "flex" }}
-                color="var(--muted)"
-                fontSize="sm"
-                fontWeight="500"
-              >
+              <nav className="hidden items-center gap-3 text-sm font-medium text-muted md:flex">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
-                    as={NextLink}
                     href={link.href}
-                    px={3}
-                    py={1}
-                    borderRadius="999px"
-                    _hover={{ color: "var(--foreground)" }}
+                    className="rounded-full px-3 py-1 transition hover:text-foreground"
                   >
                     {link.label}
                   </Link>
                 ))}
-              </HStack>
+              </nav>
 
-              <HStack spacing={3} display={{ base: "none", md: "flex" }}>
+              <div className="hidden items-center gap-3 md:flex">
                 {user ? (
-                  <Box
-                    border="1px solid"
-                    borderColor="var(--border)"
-                    px={3}
-                    py={1}
-                    borderRadius="999px"
-                    fontSize="xs"
-                    color="var(--muted)"
-                  >
+                  <div className="rounded-full border border-border px-3 py-1 text-xs text-muted">
                     {user.fullName} · {user.role}
-                  </Box>
+                  </div>
                 ) : null}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  borderRadius="999px"
-                  borderColor="var(--border)"
-                  bg="white"
+                <button
+                  type="button"
                   onClick={handleLogout}
+                  className="rounded-full border border-border bg-white px-4 py-1 text-xs font-semibold text-foreground transition hover:border-foreground"
                 >
                   Logout
-                </Button>
-              </HStack>
+                </button>
+              </div>
 
-              <IconButton
+              <button
+                type="button"
                 aria-label="Open menu"
-                icon={<HamburgerIcon />}
-                variant="outline"
-                borderColor="var(--border)"
-                display={{ base: "inline-flex", md: "none" }}
-                onClick={onOpen}
+                onClick={() => setMenuOpen(true)}
+                className="inline-flex items-center justify-center rounded-full border border-border px-3 py-2 text-sm font-semibold text-foreground md:hidden"
+              >
+                Menu
+              </button>
+            </div>
+          </header>
+
+          {menuOpen ? (
+            <div className="fixed inset-0 z-40 md:hidden">
+              <button
+                type="button"
+                aria-label="Close menu"
+                className="absolute inset-0 bg-black/40"
+                onClick={() => setMenuOpen(false)}
               />
-            </Flex>
-          </Box>
-
-          <DrawerRoot
-            open={open}
-            onOpenChange={(details) => setOpen(details.open)}
-            placement="end"
-          >
-            <DrawerBackdrop />
-            <DrawerPositioner>
-              <DrawerContent>
-                <DrawerHeader
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="space-between"
-                >
-                  <DrawerTitle>Menu</DrawerTitle>
-                  <DrawerCloseTrigger asChild>
-                    <CloseButton />
-                  </DrawerCloseTrigger>
-                </DrawerHeader>
-                <DrawerBody>
-                  <VStack align="stretch" spacing={4} mt={4}>
-                    {navLinks.map((link) => (
-                      <Link
-                        key={link.href}
-                        as={NextLink}
-                        href={link.href}
-                        fontWeight="600"
-                        onClick={onClose}
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                    {user ? (
-                      <Box
-                        border="1px solid"
-                        borderColor="var(--border)"
-                        px={3}
-                        py={2}
-                        borderRadius="lg"
-                        fontSize="sm"
-                        color="var(--muted)"
-                      >
-                        {user.fullName} · {user.role}
-                      </Box>
-                    ) : null}
-                    <Button
-                      variant="outline"
-                      borderColor="var(--border)"
-                      onClick={handleLogout}
+              <aside className="absolute right-0 top-0 flex h-full w-72 flex-col gap-6 border-l border-border bg-surface px-6 py-6 shadow-[var(--shadow)]">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold text-foreground">Menu</p>
+                  <button
+                    type="button"
+                    className="text-xs font-semibold text-muted"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {navLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="text-sm font-semibold text-foreground"
                     >
-                      Logout
-                    </Button>
-                  </VStack>
-                </DrawerBody>
-              </DrawerContent>
-            </DrawerPositioner>
-          </DrawerRoot>
+                      {link.label}
+                    </Link>
+                  ))}
+                </div>
+                {user ? (
+                  <div className="rounded-xl border border-border px-3 py-2 text-xs text-muted">
+                    {user.fullName} · {user.role}
+                  </div>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground"
+                >
+                  Logout
+                </button>
+              </aside>
+            </div>
+          ) : null}
 
-          <Box as="main" flex="1">
-            {children}
-          </Box>
+          <main className="flex-1">{children}</main>
 
-          <Box
-            as="footer"
-            borderTop="1px solid"
-            borderColor="var(--border)"
-            bg="var(--surface)"
-          >
-            <Flex
-              maxW="6xl"
-              mx="auto"
-              px={{ base: 4, md: 6 }}
-              py={6}
-              direction={{ base: "column", md: "row" }}
-              align={{ base: "flex-start", md: "center" }}
-              justify="space-between"
-              gap={2}
-              fontSize="sm"
-              color="var(--muted)"
-            >
-              <Text>ChainTrust is a digital accountability layer for institutional transfers.</Text>
-              <Text>© 2026 ChainTrust. All rights reserved.</Text>
-            </Flex>
-          </Box>
-        </Box>
+          <footer className="border-t border-border bg-surface/90">
+            <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-muted md:flex-row md:items-center md:justify-between md:px-6">
+              <p>ChainTrust is a digital accountability layer for institutional transfers.</p>
+              <p>© 2026 ChainTrust. All rights reserved.</p>
+            </div>
+          </footer>
+        </div>
       ) : (
         <main className="min-h-screen">{children}</main>
       )}
