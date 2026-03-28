@@ -1,7 +1,7 @@
 ﻿import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
-import { registerSchema } from "@/lib/validators";
+import { getZodErrorMessage, registerSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
   try {
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const parsed = registerSchema.safeParse(body);
 
     if (!parsed.success) {
-      return failure(parsed.error.errors[0]?.message ?? "Invalid input", 400);
+      return failure(getZodErrorMessage(parsed.error), 400);
     }
 
     const { fullName, email, password, role, organization } = parsed.data;

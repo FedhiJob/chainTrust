@@ -33,3 +33,6 @@ export const transferCreateSchema = z.object({
 export const verifySchema = z.object({
   batchId: z.string().uuid("Invalid batch id"),
 });
+
+export const getZodErrorMessage = (error: z.ZodError) =>
+  error.issues[0]?.message ?? "Invalid input";

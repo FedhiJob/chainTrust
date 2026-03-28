@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import { signToken, verifyPassword } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
-import { loginSchema } from "@/lib/validators";
+import { getZodErrorMessage, loginSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
   try {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const parsed = loginSchema.safeParse(body);
 
     if (!parsed.success) {
-      return failure(parsed.error.errors[0]?.message ?? "Invalid input", 400);
+      return failure(getZodErrorMessage(parsed.error), 400);
     }
 
     const { email, password } = parsed.data;

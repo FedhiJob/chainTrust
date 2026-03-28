@@ -1,7 +1,7 @@
 ﻿import { prisma } from "@/lib/prisma";
 import { getAuthPayload } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
-import { transferCreateSchema } from "@/lib/validators";
+import { getZodErrorMessage, transferCreateSchema } from "@/lib/validators";
 import { sha256 } from "@/lib/hash";
 
 function getCurrentOwnerId(batch: { createdBy: string; transfers: { receiverId: string }[] }) {
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     const parsed = transferCreateSchema.safeParse(body);
 
     if (!parsed.success) {
-      return failure(parsed.error.errors[0]?.message ?? "Invalid input", 400);
+      return failure(getZodErrorMessage(parsed.error), 400);
     }
 
     const { batchId, receiverId, senderId, location, note } = parsed.data;
