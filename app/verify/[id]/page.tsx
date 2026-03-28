@@ -1,9 +1,14 @@
-﻿import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 
-export default async function VerifyPage({ params }: { params: { id: string } }) {
+export default async function VerifyPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const batch = await prisma.batch.findUnique({
-    where: { id: params.id },
+    where: { id },
     select: {
       medicineName: true,
       batchCode: true,
