@@ -40,14 +40,20 @@ export default function CreateTransferPage() {
         if (batchRes.ok && batchJson.success && batchJson.data) {
           setBatches(batchJson.data);
           if (!form.batchId && batchJson.data.length) {
-            setForm((prev) => ({ ...prev, batchId: batchJson.data[0].id }));
+            const [firstBatch] = batchJson.data;
+            if (firstBatch) {
+              setForm((prev) => ({ ...prev, batchId: firstBatch.id }));
+            }
           }
         }
 
         if (receiverRes.ok && receiverJson.success && receiverJson.data) {
           setReceivers(receiverJson.data);
           if (!form.receiverId && receiverJson.data.length) {
-            setForm((prev) => ({ ...prev, receiverId: receiverJson.data[0].id }));
+            const [firstReceiver] = receiverJson.data;
+            if (firstReceiver) {
+              setForm((prev) => ({ ...prev, receiverId: firstReceiver.id }));
+            }
           }
         }
       } catch (err) {
