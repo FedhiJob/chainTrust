@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -15,10 +15,27 @@ type DashboardResponse = {
   message?: string;
 };
 
+type TransferRow = {
+  id: string;
+  verified: boolean;
+  createdAt: string;
+  location: string;
+  batch: { id: string; batchCode: string; medicineName: string } | null;
+  sender: { fullName: string; organization: string } | null;
+};
+
+type TransferResponse = {
+  success: boolean;
+  data?: TransferRow[];
+  message?: string;
+};
+
 export default function ReceiverDashboardPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
+  const [transfers, setTransfers] = useState<TransferRow[]>([]);
+  const [transferError, setTransferError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -51,6 +68,29 @@ export default function ReceiverDashboardPage() {
     load();
   }, [authLoading, router, user]);
 
+  useEffect(() => {
+    const loadTransfers = async () => {
+      if (authLoading) return;
+      if (!user || user.role !== "receiver") return;
+
+      try {
+        const response = await fetch("/api/transfers", { cache: "no-store" });
+        const result: TransferResponse = await response.json();
+
+        if (!response.ok || !result.success || !result.data) {
+          setTransferError(result.message ?? "Unable to load incoming transfers");
+          return;
+        }
+
+        setTransfers(result.data);
+      } catch (err) {
+        setTransferError("Unable to load incoming transfers");
+      }
+    };
+
+    loadTransfers();
+  }, [authLoading, user]);
+
   const cards = useMemo(() => {
     if (!data) return [];
     return [
@@ -74,6 +114,92 @@ export default function ReceiverDashboardPage() {
           {error}
         </div>
       ) : null}
+
+      <section className="rounded-3xl border border-border/70 bg-surface p-6 shadow-[var(--shadow)]">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold">Incoming transfers</h2>
+            <p className="text-sm text-muted">
+              Open a batch detail page to verify receipt.
+            </p>
+          </div>
+          <a
+            href="/history"
+            className="rounded-full border border-border px-4 py-1 text-xs font-semibold"
+          >
+            View history
+          </a>
+        </div>
+
+        {transferError ? (
+          <div className="mt-4 rounded-2xl border border-accent-warm/30 bg-accent-warm/10 px-4 py-3 text-sm text-accent-warm">
+            {transferError}
+          </div>
+        ) : null}
+
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="text-xs uppercase tracking-wide text-muted">
+              <tr>
+                <th className="py-2">Batch</th>
+                <th className="py-2">Sender</th>
+                <th className="py-2">Location</th>
+                <th className="py-2">Status</th>
+                <th className="py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/60">
+              {transfers.map((transfer) => {
+                const isPending = !transfer.verified;
+                return (
+                  <tr key={transfer.id}>
+                    <td className="py-3 font-medium">
+                      {transfer.batch?.batchCode ?? "-"}
+                      <div className="text-xs text-muted">
+                        {transfer.batch?.medicineName ?? ""}
+                      </div>
+                    </td>
+                    <td className="py-3">
+                      {transfer.sender?.fullName ?? "-"}
+                      <div className="text-xs text-muted">
+                        {transfer.sender?.organization ?? ""}
+                      </div>
+                    </td>
+                    <td className="py-3">{transfer.location}</td>
+                    <td className="py-3">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          isPending
+                            ? "bg-accent-warm/15 text-accent-warm"
+                            : "bg-accent/15 text-accent"
+                        }`}
+                      >
+                        {isPending ? "Pending" : "Verified"}
+                      </span>
+                    </td>
+                    <td className="py-3">
+                      {transfer.batch?.id ? (
+                        <a
+                          href={`/batches/${transfer.batch.id}`}
+                          className="rounded-full border border-border px-3 py-1 text-xs font-semibold"
+                        >
+                          {isPending ? "Verify" : "View"}
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+
+          {!transferError && transfers.length === 0 ? (
+            <p className="mt-4 text-sm text-muted">No incoming transfers yet.</p>
+          ) : null}
+        </div>
+      </section>
 
       <section className="grid gap-6 md:grid-cols-2">
         {(cards.length ? cards : [1, 2]).map((card, index) => (
