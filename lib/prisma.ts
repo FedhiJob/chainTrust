@@ -18,7 +18,18 @@ const globalForPrisma = globalThis as unknown as {
   pool?: Pool;
 };
 
-const pool = globalForPrisma.pool ?? new Pool({ connectionString: databaseUrl });
+const parsePositiveInt = (value: string | undefined) => {
+  if (!value) return null;
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) return null;
+  return parsed;
+};
+
+const poolMax =
+  parsePositiveInt(process.env.PG_POOL_MAX) ??
+  (process.env.NODE_ENV === "production" ? 2 : 10);
+
+const pool = globalForPrisma.pool ?? new Pool({ connectionString: databaseUrl, max: poolMax });
 const adapter = new PrismaPg(pool);
 
 export const prisma =
