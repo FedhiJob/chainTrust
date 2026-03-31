@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/use-auth";
+import { useToast } from "@/components/toast";
 
 type DashboardData = {
   receivedBatches: number;
@@ -33,10 +34,12 @@ type TransferResponse = {
 export default function ReceiverDashboardPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
+  const { notify } = useToast();
   const [data, setData] = useState<DashboardData | null>(null);
   const [transfers, setTransfers] = useState<TransferRow[]>([]);
   const [transferError, setTransferError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [verifyingId, setVerifyingId] = useState<string | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -67,6 +70,82 @@ export default function ReceiverDashboardPage() {
 
     load();
   }, [authLoading, router, user]);
+
+  const loadDashboard = async () => {
+    if (authLoading) return;
+    if (!user || user.role !== "receiver") return;
+
+    try {
+      const response = await fetch("/api/dashboard", { cache: "no-store" });
+      const result: DashboardResponse = await response.json();
+
+      if (!response.ok || !result.success || !result.data) {
+        setError(result.message ?? "Unable to load dashboard");
+        return;
+      }
+
+      setData(result.data);
+      setError(null);
+    } catch (err) {
+      setError("Unable to load dashboard");
+    }
+  };
+
+  const loadTransfers = async () => {
+    if (authLoading) return;
+    if (!user || user.role !== "receiver") return;
+
+    try {
+      const response = await fetch("/api/transfers", { cache: "no-store" });
+      const result: TransferResponse = await response.json();
+
+      if (!response.ok || !result.success || !result.data) {
+        setTransferError(result.message ?? "Unable to load incoming transfers");
+        return;
+      }
+
+      setTransfers(result.data);
+      setTransferError(null);
+    } catch (err) {
+      setTransferError("Unable to load incoming transfers");
+    }
+  };
+
+  const handleVerify = async (batchId: string, transferId: string) => {
+    setVerifyingId(transferId);
+
+    try {
+      const response = await fetch("/api/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ batchId }),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        const message = result.message ?? "Unable to verify batch";
+        notify({ title: "Verification failed", message, variant: "error" });
+        setVerifyingId(null);
+        return;
+      }
+
+      notify({
+        title: "Batch verified",
+        message: "Receipt confirmed and batch marked delivered.",
+        variant: "success",
+      });
+
+      await Promise.all([loadDashboard(), loadTransfers()]);
+    } catch (err) {
+      notify({
+        title: "Verification failed",
+        message: "Unable to verify batch",
+        variant: "error",
+      });
+    } finally {
+      setVerifyingId(null);
+    }
+  };
 
   useEffect(() => {
     const loadTransfers = async () => {
@@ -118,9 +197,9 @@ export default function ReceiverDashboardPage() {
       <section className="rounded-3xl border border-border/70 bg-surface p-6 shadow-[var(--shadow)]">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold">Incoming transfers</h2>
+            <h2 className="text-lg font-semibold">Incoming batches</h2>
             <p className="text-sm text-muted">
-              Open a batch detail page to verify receipt.
+              Verify receipt to complete custody transfer.
             </p>
           </div>
           <a
@@ -179,12 +258,24 @@ export default function ReceiverDashboardPage() {
                     </td>
                     <td className="py-3">
                       {transfer.batch?.id ? (
-                        <a
-                          href={`/batches/${transfer.batch.id}`}
-                          className="rounded-full border border-border px-3 py-1 text-xs font-semibold"
-                        >
-                          {isPending ? "Verify" : "View"}
-                        </a>
+                        <div className="flex flex-wrap gap-2">
+                          <a
+                            href={`/batches/${transfer.batch.id}`}
+                            className="rounded-full border border-border px-3 py-1 text-xs font-semibold"
+                          >
+                            View
+                          </a>
+                          {isPending ? (
+                            <button
+                              type="button"
+                              onClick={() => handleVerify(transfer.batch!.id, transfer.id)}
+                              disabled={verifyingId === transfer.id}
+                              className="rounded-full bg-accent px-3 py-1 text-xs font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
+                            >
+                              {verifyingId === transfer.id ? "Verifying..." : "Verify"}
+                            </button>
+                          ) : null}
+                        </div>
                       ) : (
                         "-"
                       )}

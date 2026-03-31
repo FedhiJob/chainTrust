@@ -38,21 +38,19 @@ export default function BatchesPage() {
     load();
   }, []);
 
-  const isAllowed = user?.role === "distributor" || user?.role === "admin";
-
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-6 py-12">
       <header className="space-y-2">
         <p className="text-sm uppercase tracking-[0.3em] text-accent">Batches</p>
-        <h1 className="text-3xl font-semibold">Owned batches</h1>
-        <p className="text-muted">Review active and transferred batches in your custody.</p>
+        <h1 className="text-3xl font-semibold">
+          {user?.role === "receiver" ? "Incoming batches" : "Owned batches"}
+        </h1>
+        <p className="text-muted">
+          {user?.role === "receiver"
+            ? "Review batches awaiting verification and confirmed deliveries."
+            : "Review active and transferred batches in your custody."}
+        </p>
       </header>
-
-      {!authLoading && !isAllowed ? (
-        <div className="rounded-2xl border border-accent-warm/30 bg-accent-warm/10 px-6 py-4 text-sm text-accent-warm">
-          Receivers do not manage batches here.
-        </div>
-      ) : null}
 
       {error ? (
         <div className="rounded-2xl border border-accent-warm/30 bg-accent-warm/10 px-6 py-4 text-sm text-accent-warm">

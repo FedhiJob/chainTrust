@@ -32,8 +32,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     if (!user) return [];
     const links = [{ label: "Dashboard", href: "/dashboard" }];
 
-    if (user.role === "admin" || user.role === "distributor") {
-      links.push({ label: "Batches", href: "/batches" });
+    if (user.role === "admin" || user.role === "distributor" || user.role === "receiver") {
+      links.push({
+        label: user.role === "receiver" ? "Incoming" : "Batches",
+        href: "/batches",
+      });
     }
 
     if (user.role === "distributor") {
