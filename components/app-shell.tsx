@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -84,13 +84,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               <div className="hidden items-center gap-3 md:flex">
                 {user ? (
                   <div className="rounded-full border border-border px-3 py-1 text-xs text-muted">
-                    {user.fullName} · {user.role}
+                    {user.fullName} | {user.role}
                   </div>
                 ) : null}
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="rounded-full border border-border bg-white px-4 py-1 text-xs font-semibold text-foreground transition hover:border-foreground"
+                  className="rounded-full bg-accent-strong px-4 py-1 text-xs font-semibold text-white transition hover:bg-accent"
                 >
                   Logout
                 </button>
@@ -100,7 +100,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 type="button"
                 aria-label="Open menu"
                 onClick={() => setMenuOpen(true)}
-                className="inline-flex items-center justify-center rounded-full border border-border px-3 py-2 text-sm font-semibold text-foreground md:hidden"
+                className="inline-flex items-center justify-center rounded-full bg-accent-strong px-3 py-2 text-sm font-semibold text-white transition hover:bg-accent md:hidden"
               >
                 Menu
               </button>
@@ -139,13 +139,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
                 {user ? (
                   <div className="rounded-xl border border-border px-3 py-2 text-xs text-muted">
-                    {user.fullName} · {user.role}
+                    {user.fullName} | {user.role}
                   </div>
                 ) : null}
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground"
+                  className="rounded-full bg-accent-strong px-4 py-2 text-xs font-semibold text-white transition hover:bg-accent"
                 >
                   Logout
                 </button>
@@ -158,7 +158,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <footer className="border-t border-border bg-surface/90">
             <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-sm text-muted md:flex-row md:items-center md:justify-between md:px-6">
               <p>ChainTrust is a digital accountability layer for institutional transfers.</p>
-              <p>© 2026 ChainTrust. All rights reserved.</p>
+              <p>(c) 2026 ChainTrust. All rights reserved.</p>
             </div>
           </footer>
         </div>
@@ -168,3 +168,4 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     </ToastProvider>
   );
 }
+

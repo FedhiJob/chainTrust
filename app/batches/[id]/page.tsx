@@ -194,7 +194,7 @@ export default function BatchDetailPage({
                 type="button"
                 onClick={handleVerify}
                 disabled={verifying}
-                className="rounded-full bg-accent px-5 py-2 text-xs font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
+                className="rounded-full bg-accent-strong px-5 py-2 text-xs font-semibold text-white transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {verifying ? "Verifying..." : "Verify receipt"}
               </button>

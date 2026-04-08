@@ -161,7 +161,7 @@ export default function CreateBatchPage() {
         <button
           type="submit"
           disabled={loading || !isDistributor}
-          className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
+          className="w-full rounded-xl bg-accent-strong px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-70"
         >
           {loading ? "Creating batch..." : "Create batch"}
         </button>

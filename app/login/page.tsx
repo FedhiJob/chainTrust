@@ -105,7 +105,7 @@ export default function LoginPage() {
           </p>
 
           <div className="relative mt-6 overflow-hidden rounded-3xl border border-border/60 bg-white/70 p-6 shadow-[var(--shadow)]">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(31,123,212,0.18),_transparent_55%)]" />
+            <div className="absolute inset-0 bg-white" />
             <div className="relative min-h-[150px]">
               {slides.map((slide, index) => (
                 <div
@@ -190,7 +190,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
+              className="w-full rounded-xl bg-accent-strong px-4 py-3 text-sm font-semibold text-white transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-70"
             >
               {loading ? "Signing in..." : "Sign in"}
             </button>

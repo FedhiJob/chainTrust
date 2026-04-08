@@ -102,13 +102,13 @@ export default function DistributorDashboardPage() {
       <section className="flex flex-wrap gap-3">
         <a
           href="/batches/create"
-          className="rounded-full border border-accent/30 bg-accent/10 px-5 py-2 text-sm font-semibold text-accent"
+          className="rounded-full bg-accent-strong px-5 py-2 text-sm font-semibold text-white transition hover:bg-accent"
         >
           Create Batch
         </a>
         <a
           href="/transfers/create"
-          className="rounded-full border border-accent-warm/30 bg-accent-warm/10 px-5 py-2 text-sm font-semibold text-accent-warm"
+          className="rounded-full border border-accent/30 bg-surface px-5 py-2 text-sm font-semibold text-accent transition hover:bg-accent/10"
         >
           Create Transfer
         </a>

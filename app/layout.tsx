@@ -19,7 +19,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_left,_rgba(31,123,212,0.35),_transparent_45%),radial-gradient(circle_at_right,_rgba(255,255,255,0.7),_transparent_50%)]" />
+        <div className="pointer-events-none fixed inset-0 -z-10 bg-background" />
         <AppShell>{children}</AppShell>
       </body>
     </html>
