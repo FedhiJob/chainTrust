@@ -6,7 +6,7 @@ import crypto from "crypto";
 import QRCode from "qrcode";
 import { config } from "dotenv";
 
-config({ override: true });
+config();
 
 const databaseUrl = process.env.DATABASE_URL;
 
