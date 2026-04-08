@@ -73,7 +73,11 @@ async function ensureBatch(params: {
       );
     }
 
-    if (!existing.qrCode) {
+    const shouldRefreshQrCode =
+      !existing.qrCode ||
+      Boolean(process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_URL);
+
+    if (shouldRefreshQrCode) {
       const qrContent = `${BASE_URL.replace(/\/$/, "")}/verify/${existing.id}`;
       updateData.qrCode = await QRCode.toDataURL(qrContent);
     }
