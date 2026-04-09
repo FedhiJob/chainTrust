@@ -6,6 +6,17 @@ import crypto from "crypto";
 import QRCode from "qrcode";
 import { config } from "dotenv";
 
+// If a non-Postgres DATABASE_URL is present in the shell (e.g. `file:./dev.db`),
+// prefer the project's `.env` value for seeding.
+const existingDatabaseUrl = process.env.DATABASE_URL;
+if (
+  existingDatabaseUrl &&
+  !existingDatabaseUrl.startsWith("postgresql://") &&
+  !existingDatabaseUrl.startsWith("postgres://")
+) {
+  delete process.env.DATABASE_URL;
+}
+
 config();
 
 const databaseUrl = process.env.DATABASE_URL;

@@ -3,6 +3,19 @@
 import { config } from "dotenv";
 import { defineConfig } from "prisma/config";
 
+// Prisma CLI won't override existing env vars by default. If the user has a stray
+// DATABASE_URL in their shell (e.g. `file:./dev.db` from another project), it can
+// break migrations/seeding for this Postgres app. If the existing value is not a
+// Postgres URL, ignore it and load from `.env`.
+const existingDatabaseUrl = process.env.DATABASE_URL;
+if (
+  existingDatabaseUrl &&
+  !existingDatabaseUrl.startsWith("postgresql://") &&
+  !existingDatabaseUrl.startsWith("postgres://")
+) {
+  delete process.env.DATABASE_URL;
+}
+
 config();
 
 export default defineConfig({
