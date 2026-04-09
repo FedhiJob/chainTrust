@@ -25,6 +25,7 @@ chaintrust_tmp/
 # misc
 .DS_Store
 *.pem
+dev.db
 
 # debug
 npm-debug.log*
