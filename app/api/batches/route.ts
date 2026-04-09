@@ -10,6 +10,13 @@ function getCurrentOwnerId(batch: { createdBy: string; transfers: { receiverId: 
   return batch.transfers[0]?.receiverId ?? batch.createdBy;
 }
 
+function withCurrentOwnerId<T extends { createdBy: string; transfers: { receiverId: string }[] }>(batch: T) {
+  return {
+    ...batch,
+    currentOwnerId: getCurrentOwnerId(batch),
+  };
+}
+
 export async function GET() {
   try {
     const auth = await getAuthPayload();
@@ -29,19 +36,11 @@ export async function GET() {
     });
 
     if (auth.role === "admin") {
-      return success(
-        batches.map((batch) => ({
-          ...batch,
-          currentOwnerId: getCurrentOwnerId(batch),
-        }))
-      );
+      return success(batches.map(withCurrentOwnerId));
     }
 
     const filtered = batches
-      .map((batch) => ({
-        ...batch,
-        currentOwnerId: getCurrentOwnerId(batch),
-      }))
+      .map(withCurrentOwnerId)
       .filter((batch) => batch.currentOwnerId === auth.id);
 
     return success(filtered);
