@@ -1,7 +1,7 @@
 ﻿import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
-import { failure, success } from "@/lib/response";
 import { getZodErrorMessage, registerSchema } from "@/lib/validators";
+import { failure, success } from "@/lib/response";
 
 export async function POST(request: Request) {
   try {
