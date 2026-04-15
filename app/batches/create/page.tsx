@@ -57,6 +57,7 @@ export default function CreateBatchPage() {
         variant: "success",
       });
       router.push(`/batches/${result.data.id}`);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (err) {
       setError("Unable to create batch");
       notify({
@@ -85,7 +86,7 @@ export default function CreateBatchPage() {
       ) : null}
 
       <form
-        className="grid gap-5 rounded-3xl border border-border/70 bg-surface p-8 shadow-[var(--shadow)]"
+        className="grid gap-5 rounded-3xl border border-border/70 bg-surface p-8 shadow-(--shadow)"
         onSubmit={handleSubmit}
       >
         <div className="grid gap-4 md:grid-cols-2">
