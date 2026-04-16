@@ -102,7 +102,7 @@ export default function DistributorDashboardPage() {
       <section className="flex flex-wrap gap-3">
         <a
           href="/batches/create"
-          className="rounded-full bg-accent-strong px-5 py-2 text-sm font-semibold text-white transition hover:bg-accent"
+          className="btn-primary rounded-full px-5 py-2 text-sm font-semibold"
         >
           Create Batch
         </a>

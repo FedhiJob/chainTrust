@@ -270,7 +270,7 @@ export default function ReceiverDashboardPage() {
                               type="button"
                               onClick={() => handleVerify(transfer.batch!.id, transfer.id)}
                               disabled={verifyingId === transfer.id}
-                              className="rounded-full bg-accent-strong px-3 py-1 text-xs font-semibold text-white transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-70"
+                              className="btn-primary rounded-full px-3 py-1 text-xs font-semibold"
                             >
                               {verifyingId === transfer.id ? "Verifying..." : "Verify"}
                             </button>

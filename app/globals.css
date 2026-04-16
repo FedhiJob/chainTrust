@@ -38,6 +38,27 @@ a {
   text-decoration: none;
 }
 
+.btn-primary {
+  background: var(--accent-strong);
+  color: #ffffff;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.btn-primary:disabled,
+.btn-primary[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
 @keyframes fade-up {
   from {
     opacity: 0;

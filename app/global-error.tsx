@@ -23,7 +23,7 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
           <button
             type="button"
             onClick={reset}
-            className="rounded-full bg-accent-strong px-5 py-2 text-xs font-semibold text-white transition hover:bg-accent"
+            className="btn-primary rounded-full px-5 py-2 text-xs font-semibold"
           >
             Try again
           </button>
