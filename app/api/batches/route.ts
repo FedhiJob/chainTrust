@@ -1,7 +1,7 @@
-﻿import crypto from "crypto";
+import crypto from "crypto";
 import QRCode from "qrcode";
 import { prisma } from "@/lib/prisma";
-import { getAuthPayload } from "@/lib/auth";
+import { getAuthenticatedUserFromRequest } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
 import { batchCreateSchema, getZodErrorMessage } from "@/lib/validators";
 import { sha256 } from "@/lib/hash";
@@ -19,7 +19,7 @@ function withCurrentOwnerId<T extends { createdBy: string; transfers: { receiver
 
 export async function GET() {
   try {
-    const auth = await getAuthPayload();
+    const auth = await getAuthenticatedUserFromRequest();
     if (!auth) return failure("Unauthorized", 401);
 
     const batches = await prisma.batch.findMany({
@@ -44,14 +44,14 @@ export async function GET() {
       .filter((batch) => batch.currentOwnerId === auth.id);
 
     return success(filtered);
-  } catch (error) {
+  } catch {
     return failure("Failed to load batches", 500);
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const auth = await getAuthPayload();
+    const auth = await getAuthenticatedUserFromRequest();
     if (!auth) return failure("Unauthorized", 401);
     if (auth.role !== "distributor") {
       return failure("Only distributors can create batches", 403);
@@ -103,8 +103,7 @@ export async function POST(request: Request) {
     });
 
     return success(batch, 201);
-  } catch (error) {
+  } catch {
     return failure("Failed to create batch", 500);
   }
 }
-

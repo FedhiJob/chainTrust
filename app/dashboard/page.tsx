@@ -1,22 +1,22 @@
-﻿import { redirect } from "next/navigation";
-import { getAuthPayload } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { getAuthenticatedUser } from "@/lib/auth";
 
 export default async function DashboardIndex() {
-  const auth = await getAuthPayload();
+  const user = await getAuthenticatedUser();
 
-  if (!auth) {
+  if (!user) {
     redirect("/login");
   }
 
-  if (auth.role === "admin") {
+  if (user.role === "admin") {
     redirect("/dashboard/admin");
   }
 
-  if (auth.role === "distributor") {
+  if (user.role === "distributor") {
     redirect("/dashboard/distributor");
   }
 
-  if (auth.role === "receiver") {
+  if (user.role === "receiver") {
     redirect("/dashboard/receiver");
   }
 

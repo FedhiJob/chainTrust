@@ -1,5 +1,5 @@
-﻿import { prisma } from "@/lib/prisma";
-import { getAuthPayload } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { getAuthenticatedUserFromRequest } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
 import { getZodErrorMessage, transferCreateSchema } from "@/lib/validators";
 import { sha256 } from "@/lib/hash";
@@ -10,7 +10,7 @@ function getCurrentOwnerId(batch: { createdBy: string; transfers: { receiverId: 
 
 export async function GET() {
   try {
-    const auth = await getAuthPayload();
+    const auth = await getAuthenticatedUserFromRequest();
     if (!auth) return failure("Unauthorized", 401);
 
     const transfers = await prisma.transfer.findMany({
@@ -29,14 +29,14 @@ export async function GET() {
     );
 
     return success(filtered);
-  } catch (error) {
+  } catch {
     return failure("Failed to load transfers", 500);
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const auth = await getAuthPayload();
+    const auth = await getAuthenticatedUserFromRequest();
     if (!auth) return failure("Unauthorized", 401);
     if (auth.role !== "distributor") {
       return failure("Only distributors can create transfers", 403);
@@ -104,7 +104,7 @@ export async function POST(request: Request) {
     });
 
     return success(transfer, 201);
-  } catch (error) {
+  } catch {
     return failure("Failed to create transfer", 500);
   }
 }

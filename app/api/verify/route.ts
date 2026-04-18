@@ -1,11 +1,11 @@
-﻿import { prisma } from "@/lib/prisma";
-import { getAuthPayload } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { getAuthenticatedUserFromRequest } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
 import { getZodErrorMessage, verifySchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
   try {
-    const auth = await getAuthPayload();
+    const auth = await getAuthenticatedUserFromRequest();
     if (!auth) return failure("Unauthorized", 401);
     if (auth.role !== "receiver") {
       return failure("Only receivers can verify batches", 403);
@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     });
 
     return success(updated);
-  } catch (error) {
+  } catch {
     return failure("Failed to verify transfer", 500);
   }
 }

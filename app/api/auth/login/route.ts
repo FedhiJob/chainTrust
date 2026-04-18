@@ -1,6 +1,5 @@
-﻿import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { signToken, verifyPassword } from "@/lib/auth";
+import { setAuthCookie, signToken, verifyPassword } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
 import { getZodErrorMessage, loginSchema } from "@/lib/validators";
 
@@ -13,7 +12,8 @@ export async function POST(request: Request) {
       return failure(getZodErrorMessage(parsed.error), 400);
     }
 
-    const { email, password } = parsed.data;
+    const password = parsed.data.password;
+    const email = parsed.data.email.trim().toLowerCase();
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
@@ -26,17 +26,7 @@ export async function POST(request: Request) {
     }
 
     const token = signToken({ id: user.id, role: user.role });
-
-    const cookieStore = await cookies();
-    cookieStore.set({
-      name: "token",
-      value: token,
-      httpOnly: true,
-      sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
-      path: "/",
-      maxAge: 60 * 60 * 24 * 7,
-    });
+    await setAuthCookie(token);
 
     return success({
       id: user.id,
@@ -46,7 +36,7 @@ export async function POST(request: Request) {
       organization: user.organization,
       createdAt: user.createdAt,
     });
-  } catch (error) {
+  } catch {
     return failure("Login failed", 500);
   }
 }

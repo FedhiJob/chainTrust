@@ -1,4 +1,4 @@
-﻿import { prisma } from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
 import { getZodErrorMessage, registerSchema } from "@/lib/validators";
 import { failure, success } from "@/lib/response";
@@ -12,7 +12,10 @@ export async function POST(request: Request) {
       return failure(getZodErrorMessage(parsed.error), 400);
     }
 
-    const { fullName, email, password, role, organization } = parsed.data;
+    const fullName = parsed.data.fullName.trim();
+    const email = parsed.data.email.trim().toLowerCase();
+    const organization = parsed.data.organization.trim();
+    const { password, role } = parsed.data;
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
@@ -40,7 +43,7 @@ export async function POST(request: Request) {
     });
 
     return success(user, 201);
-  } catch (error) {
+  } catch {
     return failure("Registration failed", 500);
   }
 }

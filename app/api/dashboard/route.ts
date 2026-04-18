@@ -1,10 +1,10 @@
-﻿import { prisma } from "@/lib/prisma";
-import { getAuthPayload } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+import { getAuthenticatedUserFromRequest } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
 
 export async function GET() {
   try {
-    const auth = await getAuthPayload();
+    const auth = await getAuthenticatedUserFromRequest();
     if (!auth) return failure("Unauthorized", 401);
 
     if (auth.role === "admin") {
@@ -36,7 +36,7 @@ export async function GET() {
     });
 
     return success({ receivedBatches, pendingConfirmations });
-  } catch (error) {
+  } catch {
     return failure("Failed to load dashboard", 500);
   }
 }
