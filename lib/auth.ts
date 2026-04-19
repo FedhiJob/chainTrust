@@ -18,6 +18,15 @@ export const authUserSelect = {
   createdAt: true,
 } as const;
 
+export type AuthenticatedUser = {
+  id: string;
+  fullName: string;
+  email: string;
+  role: Role;
+  organization: string;
+  createdAt: Date;
+};
+
 type TokenPayload = JwtPayload & {
   id?: unknown;
   role?: unknown;
@@ -114,7 +123,10 @@ export async function getAuthenticatedUser() {
     return null;
   }
 
-  return user;
+  return {
+    ...user,
+    role: user.role,
+  } satisfies AuthenticatedUser;
 }
 
 export async function getAuthenticatedUserFromRequest() {
