@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { setAuthCookie, signToken, verifyPassword } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
+import { isRole } from "@/lib/roles";
 import { getZodErrorMessage, loginSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
@@ -23,6 +24,10 @@ export async function POST(request: Request) {
     const valid = await verifyPassword(password, user.password);
     if (!valid) {
       return failure("Invalid email or password", 401);
+    }
+
+    if (!isRole(user.role)) {
+      return failure("Account role is invalid", 403);
     }
 
     const token = signToken({ id: user.id, role: user.role });
