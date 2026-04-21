@@ -17,6 +17,7 @@ model User {
 
   sentTransfers     Transfer[] @relation("SenderTransfers")
   receivedTransfers Transfer[] @relation("ReceiverTransfers")
+  auditLogs         AuditLog[]
 }
 
 model Batch {
@@ -49,4 +50,25 @@ model Transfer {
   batch    Batch @relation(fields: [batchId], references: [id])
   sender   User  @relation("SenderTransfers", fields: [senderId], references: [id])
   receiver User  @relation("ReceiverTransfers", fields: [receiverId], references: [id])
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  actorId    String?
+  actorRole  String?
+  action     String
+  targetType String
+  targetId   String?
+  status     String
+  ipAddress  String?
+  userAgent  String?
+  detail     Json?
+  createdAt  DateTime @default(now())
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([actorId, createdAt])
+  @@index([targetType, targetId, createdAt])
+  @@index([action, createdAt])
 }
