@@ -2,10 +2,15 @@ import { prisma } from "@/lib/prisma";
 import { setAuthCookie, signToken, verifyPassword } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
 import { isRole } from "@/lib/roles";
+import { assertSameOrigin, getRateLimitHeaders, rateLimitLogin } from "@/lib/security";
 import { getZodErrorMessage, loginSchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
   try {
+    if (!assertSameOrigin(request)) {
+      return failure("Cross-site request blocked", 403);
+    }
+
     const body = await request.json().catch(() => null);
     const parsed = loginSchema.safeParse(body);
 
@@ -15,6 +20,11 @@ export async function POST(request: Request) {
 
     const password = parsed.data.password;
     const email = parsed.data.email.trim().toLowerCase();
+    const rateLimit = rateLimitLogin(request, email);
+    if (!rateLimit.allowed) {
+      return failure("Too many login attempts. Please try again later.", 429, getRateLimitHeaders(rateLimit.resetAt, rateLimit.remaining));
+    }
+
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {

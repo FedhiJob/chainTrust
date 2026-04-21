@@ -1,10 +1,15 @@
 import { prisma } from "@/lib/prisma";
 import { getAuthenticatedUserFromRequest } from "@/lib/auth";
 import { failure, success } from "@/lib/response";
+import { assertSameOrigin } from "@/lib/security";
 import { getZodErrorMessage, verifySchema } from "@/lib/validators";
 
 export async function POST(request: Request) {
   try {
+    if (!assertSameOrigin(request)) {
+      return failure("Cross-site request blocked", 403);
+    }
+
     const auth = await getAuthenticatedUserFromRequest();
     if (!auth) return failure("Unauthorized", 401);
     if (auth.role !== "receiver") {

@@ -2,9 +2,14 @@ import { prisma } from "@/lib/prisma";
 import { hashPassword } from "@/lib/auth";
 import { getZodErrorMessage, registerSchema } from "@/lib/validators";
 import { failure, success } from "@/lib/response";
+import { assertSameOrigin, getRateLimitHeaders, rateLimitRegistration } from "@/lib/security";
 
 export async function POST(request: Request) {
   try {
+    if (!assertSameOrigin(request)) {
+      return failure("Cross-site request blocked", 403);
+    }
+
     const body = await request.json().catch(() => null);
     const parsed = registerSchema.safeParse(body);
 
@@ -16,6 +21,10 @@ export async function POST(request: Request) {
     const email = parsed.data.email.trim().toLowerCase();
     const organization = parsed.data.organization.trim();
     const { password, role } = parsed.data;
+    const rateLimit = rateLimitRegistration(request, email);
+    if (!rateLimit.allowed) {
+      return failure("Too many registration attempts. Please try again later.", 429, getRateLimitHeaders(rateLimit.resetAt, rateLimit.remaining));
+    }
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
