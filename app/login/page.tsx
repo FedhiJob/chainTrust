@@ -104,9 +104,9 @@ export default function LoginPage() {
             Record transfers, verify receipts, and prove provenance across Ethiopian pharmaceutical supply chains.
           </p>
 
-          <div className="relative mt-6 overflow-hidden rounded-3xl border border-border/60 bg-white/70 p-6 shadow-[var(--shadow)]">
+          <div className="relative mt-6 overflow-hidden rounded-3xl border border-border/60 bg-white/70 p-6 shadow-(--shadow)">
             <div className="absolute inset-0 bg-white" />
-            <div className="relative min-h-[150px]">
+            <div className="relative min-h-37.5">
               {slides.map((slide, index) => (
                 <div
                   key={slide.title}
@@ -141,12 +141,12 @@ export default function LoginPage() {
         </div>
         <div className="space-y-3 text-sm text-muted">
           <p>Built for distributors, receivers, and regulators.</p>
-          <p>Secure JWT access, traceable transfers, QR verification.</p>
+          <p>Secure access, traceable transfers, and QR verification.</p>
         </div>
       </section>
 
       <section className="flex w-full flex-col items-center justify-center px-6 py-12 lg:w-1/2">
-        <div className="w-full max-w-md rounded-3xl border border-border/70 bg-surface p-8 shadow-[var(--shadow)]">
+        <div className="w-full max-w-md rounded-3xl border border-border/70 bg-surface p-8 shadow-(--shadow)">
           <div className="mb-8 space-y-2">
             <div className="flex items-center gap-3">
               <Image src="/logo.png" alt="ChainTrust logo" width={36} height={36} />
